@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
+import 'package:projeto_lista_produtos/screens/components/favorite_icon.dart';
 
 class ProductList extends StatefulWidget {
   const ProductList({super.key});
@@ -17,8 +19,14 @@ class _ProductListState extends State<ProductList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ProductList'),
+      appBar: CustomAppBar(
+        title: 'Products', 
+        iconWidget:  FavoriteIcon(
+          isFavorite: false,
+          onPressed: () {
+            print('Coração clicado');
+          }, // TODO: implementar ação
+        ),
       ),
       body: ListView.builder(
         itemCount: 5,
