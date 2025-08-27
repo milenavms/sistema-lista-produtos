@@ -22,25 +22,7 @@ class ProductList extends StatefulWidget {
       description: 'Produto 2',
       price: 25.50,
       imageUrl: 'https://via.placeholder.com/150',
-    ),
-    Product(
-      id: 3,
-      description: 'Produto 3',
-      price: 12.75,
-      imageUrl: 'https://via.placeholder.com/150',
-    ),
-    Product(
-      id: 4,
-      description: 'Produto 4',
-      price: 25.50,
-      imageUrl: 'https://via.placeholder.com/150',
-    ),
-    Product(
-      id: 5,
-      description: 'Produto 5',
-      price: 12.75,
-      imageUrl: 'https://via.placeholder.com/150',
-    ),
+    )
   ];
 
   @override
@@ -51,6 +33,8 @@ class _ProductListState extends State<ProductList> {
 
    final double marginTop = kIsWeb ? 16.0 : 0.0;
    final double marginBottom = kIsWeb ? 20.0 : 0.0;
+   final double navbarHeight = kToolbarHeight; // default AppBar height
+   bool get hasProducts => widget.products.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -76,15 +60,24 @@ class _ProductListState extends State<ProductList> {
                 color: Colors.white, 
                 borderRadius: BorderRadius.circular(8),
               ),
-              constraints: BoxConstraints(
-                minHeight: 400,
-                maxWidth: kIsWeb ? 800 : double.infinity,
-              ),
               child: Column(
                 children: [
                 SearchButton(),
-                _buildProductList(widget.products),
-              ], 
+                ConstrainedBox( 
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height - navbarHeight - marginTop - marginBottom - 100,
+                    maxWidth: kIsWeb ? 800 : double.infinity,
+                  ),
+                  child: hasProducts
+                    ? Align( 
+                        alignment: Alignment.topCenter,
+                        child: _buildProductList(widget.products),
+                      )
+                    : Center(
+                        child: _buildErrorMessage(),
+                      ),
+                ),
+                ], 
               )
             ),
           ),
@@ -109,6 +102,33 @@ class _ProductListState extends State<ProductList> {
             child: CustomCardProducts(product: product),
           );
         }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildErrorMessage() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            'assets/error_search.png',
+            width: 200,
+            height: 200,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'The list is empty',
+            style: const TextStyle(
+              fontSize: 18,
+              color: Color(0xA637474F),
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
