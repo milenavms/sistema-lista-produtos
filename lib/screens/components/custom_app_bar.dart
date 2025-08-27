@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final Widget? iconWidget;
   final VoidCallback? onIconPressed;
+  final bool showBackButton;
+  final String? roteGoBack;
 
   const CustomAppBar({
     super.key,
     required this.title,
     this.iconWidget,
     this.onIconPressed,
+    this.showBackButton = false,
+    this.roteGoBack
   });
 
   @override
@@ -25,6 +30,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child:  Row(
           children: [
+            if (showBackButton)
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () {
+                  if (roteGoBack != null) {
+                    context.go(roteGoBack!); // usa go_router
+                  } else {
+                    Navigator.of(context).pop(); // fallback
+                  }
+                },
+              ),
+
             Text(
               title, 
               style: const TextStyle(

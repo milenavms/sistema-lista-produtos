@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:projeto_lista_produtos/screens/products/product_favorites.dart';
 import 'screens/products/product_list.dart';
 import 'screens/products/product_details.dart';
 
@@ -16,6 +17,10 @@ final GoRouter _router = GoRouter(
         final id = int.tryParse(state.pathParameters['id']!);
         return ProductDetails(productId: id);
       },
+    ),
+      GoRoute(
+      path: '/favorites',
+      builder: (context, state) => ProductFavorites(),
     ),
   ],
 );

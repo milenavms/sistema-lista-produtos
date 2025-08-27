@@ -32,6 +32,8 @@ class _ProductFavoritesState extends State<ProductFavorites> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
+        showBackButton: true,
+        roteGoBack: "/",
         title: 'Favorites'
       ),
       body: SingleChildScrollView(

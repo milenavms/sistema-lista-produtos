@@ -58,6 +58,8 @@ class ProductDetails extends StatelessWidget {
 
     return Scaffold(
       appBar: CustomAppBar(
+        showBackButton: true,
+        roteGoBack: "/",
         title: 'Product Details',
         iconWidget: FavoriteIcon(
           isFavorite: !isProductNull,

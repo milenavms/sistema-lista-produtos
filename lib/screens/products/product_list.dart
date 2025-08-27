@@ -6,7 +6,6 @@ import 'package:projeto_lista_produtos/screens/components/custom_card_products.d
 import 'package:projeto_lista_produtos/screens/components/favorite_icon.dart';
 import 'package:flutter/foundation.dart';
 import 'package:projeto_lista_produtos/screens/components/search_button.dart';
-import 'package:projeto_lista_produtos/screens/products/product_favorites.dart';
 
 class ProductList extends StatefulWidget {
   ProductList({super.key});
@@ -39,12 +38,7 @@ class _ProductListState extends State<ProductList> {
         iconWidget: FavoriteIcon(
           isFavorite: false,
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductFavorites(),
-              ),
-            );
+            context.go('/favorites'); 
           },
         ),
       ),
