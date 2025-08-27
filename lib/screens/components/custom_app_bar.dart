@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -14,15 +15,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double horizontalPadding = kIsWeb ? 32.0 : 16.0;
+
     return AppBar(
       automaticallyImplyLeading: false,
       backgroundColor: Colors.white, 
       elevation: 0, 
-      title: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Text(
+      title: Padding(
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+        child:  Row(
+          children: [
+            Text(
               title, 
               style: const TextStyle(
                 color: Colors.black, 
@@ -31,10 +34,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 fontFamily: 'Poppins',
               ),
             ),
-          ),
-          const Spacer(),
-          iconWidget
-        ],
+            const Spacer(),
+            iconWidget
+          ],
+        ),
       ),
     );
   }
