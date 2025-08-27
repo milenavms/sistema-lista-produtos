@@ -1,18 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:projeto_lista_produtos/domain/models/product.dart';
+import 'package:projeto_lista_produtos/screens/components/info_row.dart';
 import 'favorite_icon.dart';
 
-class Product {
-  final String description;
-  final double price;
-  final String imageUrl;
-
-  Product({
-    required this.description,
-    required this.price,
-    required this.imageUrl,
-  });
-}
 
 class CustomCardProducts extends StatelessWidget {
   final Product product;
@@ -111,30 +102,12 @@ class _ProductDetailsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Image.asset('assets/star.png', width: 22, height: 22),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Text(
-            "Informações adicionais muito grande que poderia quebrar a tela",
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Poppins',
-              color: Colors.grey,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            softWrap: false,
-          ),
-        ),
-        const SizedBox(width: 6),
-        FavoriteIcon(
-          isFavorite: false,
-          onPressed: () => print('Coração clicado'), //TODO: implementar ação
-        ),
-      ],
+    return InfoRow(
+      text: "Entrega prevista para amanhã",
+      child: FavoriteIcon(
+           isFavorite: false,
+           onPressed: () => print('Coração clicado'), //TODO: implementar ação
+         )
     );
   }
 }

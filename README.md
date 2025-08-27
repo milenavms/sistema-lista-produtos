@@ -6,6 +6,18 @@ Aplicação desenvolvida em Flutter para listar e favoritar produtos.
 ### ⚙️ Tecnologias Utilizadas
 - **Flutter** –  Web, Android e IOS
 
+## ⚠️ Dependências
+
+- Instale as dependências do Flutter:
+```bash
+flutter pub get
+``` 
+
+- Certifique-se de que a dependência go_router está listada no pubspec.yaml. Se não estiver, adicione:
+```bash
+flutter pub add go_router
+``` 
+
 ## 🚀 Como executar
 
 #### Abrir no VSCODE e rodar os seguintes comandos:

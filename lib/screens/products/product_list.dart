@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:projeto_lista_produtos/domain/models/product.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
 import 'package:projeto_lista_produtos/screens/components/favorite_icon.dart';
@@ -9,26 +11,31 @@ class ProductList extends StatefulWidget {
 
   final List<Product> products = [
     Product(
+      id: 1,
       description: 'Produto 1',
       price: 10.99,
       imageUrl: 'https://via.placeholder.com/150',
     ),
     Product(
+      id: 2,
       description: 'Produto 2',
       price: 25.50,
       imageUrl: 'https://via.placeholder.com/150',
     ),
     Product(
+      id: 3,
       description: 'Produto 3',
       price: 12.75,
       imageUrl: 'https://via.placeholder.com/150',
     ),
-        Product(
+    Product(
+      id: 4,
       description: 'Produto 4',
       price: 25.50,
       imageUrl: 'https://via.placeholder.com/150',
     ),
     Product(
+      id: 5,
       description: 'Produto 5',
       price: 12.75,
       imageUrl: 'https://via.placeholder.com/150',
@@ -40,12 +47,6 @@ class ProductList extends StatefulWidget {
 }
 
 class _ProductListState extends State<ProductList> {
-
-  @override
-  void initState() {
-    super.initState();
-    // chama a API
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,23 +77,29 @@ class _ProductListState extends State<ProductList> {
       ),
     ); 
   }
+
+  Widget _buildProductList(List<Product> products) {
+    final double marginTop = kIsWeb ? 16.0 : 0.0;
+    final double marginBottom = kIsWeb ? 20.0 : 0.0;
+
+    return Container(
+      margin: EdgeInsets.only(top: marginTop, bottom: marginBottom),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        children: products.map((product) {
+          return InkWell(
+            onTap: () {
+              context.go('/details/${product.id}');
+            },
+            child: CustomCardProducts(product: product),
+          );
+        }).toList(),
+      ),
+    );
+  }
 }
 
 
-Widget _buildProductList(List<Product> products) {
-  final double marginTop = kIsWeb ? 16.0 : 0.0;
-  final double marginBottom = kIsWeb ? 20.0 : 0.0;
-
-  return Container(
-    margin:  EdgeInsets.only(top: marginTop, bottom: marginBottom),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Column(
-      children: products
-          .map((product) => CustomCardProducts(product: product))
-          .toList(),
-    ),
-  );
-}
