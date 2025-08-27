@@ -5,6 +5,7 @@ import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
 import 'package:projeto_lista_produtos/screens/components/favorite_icon.dart';
 import 'package:flutter/foundation.dart';
+import 'package:projeto_lista_produtos/screens/components/search_button.dart';
 
 class ProductList extends StatefulWidget {
   ProductList({super.key});
@@ -48,6 +49,9 @@ class ProductList extends StatefulWidget {
 
 class _ProductListState extends State<ProductList> {
 
+   final double marginTop = kIsWeb ? 16.0 : 0.0;
+   final double marginBottom = kIsWeb ? 20.0 : 0.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,12 +69,23 @@ class _ProductListState extends State<ProductList> {
           width: double.infinity,
           color: Colors.grey[200],
           child: Center(
-            child: ConstrainedBox(
+            child: Container(
+              margin: EdgeInsets.only(top: marginTop, bottom: marginBottom),
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white, 
+                borderRadius: BorderRadius.circular(8),
+              ),
               constraints: BoxConstraints(
                 minHeight: 400,
                 maxWidth: kIsWeb ? 800 : double.infinity,
               ),
-              child: _buildProductList(widget.products),
+              child: Column(
+                children: [
+                SearchButton(),
+                _buildProductList(widget.products),
+              ], 
+              )
             ),
           ),
         ),
@@ -79,9 +94,6 @@ class _ProductListState extends State<ProductList> {
   }
 
   Widget _buildProductList(List<Product> products) {
-    final double marginTop = kIsWeb ? 16.0 : 0.0;
-    final double marginBottom = kIsWeb ? 20.0 : 0.0;
-
     return Container(
       margin: EdgeInsets.only(top: marginTop, bottom: marginBottom),
       decoration: BoxDecoration(

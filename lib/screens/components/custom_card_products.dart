@@ -22,7 +22,7 @@ class CustomCardProducts extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.zero,
         border: Border(
-          bottom: BorderSide(color: Colors.grey, width: 0.5),
+          bottom: BorderSide(color: Color.fromARGB(255, 221, 220, 220), width: 0.5),
         ),
       ),
       child: Row(
