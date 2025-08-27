@@ -3,13 +3,13 @@ import 'package:flutter/foundation.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final Widget iconWidget;
+  final Widget? iconWidget;
   final VoidCallback? onIconPressed;
 
   const CustomAppBar({
     super.key,
     required this.title,
-    required this.iconWidget,
+    this.iconWidget,
     this.onIconPressed,
   });
 
@@ -35,7 +35,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ),
             const Spacer(),
-            iconWidget
+            if (iconWidget != null) iconWidget!,
           ],
         ),
       ),

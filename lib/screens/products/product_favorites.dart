@@ -3,13 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:projeto_lista_produtos/domain/models/product.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
-import 'package:projeto_lista_produtos/screens/components/favorite_icon.dart';
 import 'package:flutter/foundation.dart';
-import 'package:projeto_lista_produtos/screens/components/search_button.dart';
-import 'package:projeto_lista_produtos/screens/products/product_favorites.dart';
 
-class ProductList extends StatefulWidget {
-  ProductList({super.key});
+class ProductFavorites extends StatefulWidget {
+  ProductFavorites({super.key});
 
   final List<Product> products = [
     Product(
@@ -21,10 +18,10 @@ class ProductList extends StatefulWidget {
   ];
 
   @override
-  _ProductListState createState() => _ProductListState();
+  _ProductFavoritesState createState() => _ProductFavoritesState();
 }
 
-class _ProductListState extends State<ProductList> {
+class _ProductFavoritesState extends State<ProductFavorites> {
 
    final double marginTop = kIsWeb ? 16.0 : 0.0;
    final double marginBottom = kIsWeb ? 20.0 : 0.0;
@@ -35,18 +32,7 @@ class _ProductListState extends State<ProductList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Products',
-        iconWidget: FavoriteIcon(
-          isFavorite: false,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductFavorites(),
-              ),
-            );
-          },
-        ),
+        title: 'Favorites'
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -62,10 +48,9 @@ class _ProductListState extends State<ProductList> {
               ),
               child: Column(
                 children: [
-                SearchButton(),
                 ConstrainedBox( 
                   constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height - navbarHeight - marginTop - marginBottom - 100,
+                    minHeight: MediaQuery.of(context).size.height - navbarHeight - marginTop - marginBottom - 20,
                     maxWidth: kIsWeb ? 800 : double.infinity,
                   ),
                   child: hasProducts
