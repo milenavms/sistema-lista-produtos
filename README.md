@@ -92,11 +92,17 @@ flutter run -d chrome
 ## 📸 Imagens da Tela
 
 WEB - Chrome
+
+
 ![Image](https://github.com/user-attachments/assets/a7a85034-b4ac-4335-85d1-53cbf7236982)
 
 Mobile Iphone SE
+
+
 ![Image](https://github.com/user-attachments/assets/2f254989-a60a-424b-adf3-64b20a75f16e)
 
 Mobile  - Android 11 R
+
+
 ![Image](https://github.com/user-attachments/assets/55d30e6d-8de8-4f29-a3e8-04d060816c2f)
 
