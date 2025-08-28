@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_lista_produtos/domain/models/product_model.dart';
+import 'package:projeto_lista_produtos/screens/components/favorite_button.dart';
 import 'package:projeto_lista_produtos/screens/components/info_row.dart';
 import 'package:projeto_lista_produtos/screens/components/product_image_skeleton.dart';
-import 'favorite_icon.dart';
-
 
 class CustomCardProducts extends StatelessWidget {
   final Product product;
+  final bool isFavoriteVisibleIcon;
 
-  const CustomCardProducts({super.key, required this.product});
+  const CustomCardProducts({super.key, required this.product, this.isFavoriteVisibleIcon = true});
 
   @override
   Widget build(BuildContext context) {
-
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -29,14 +28,13 @@ class CustomCardProducts extends StatelessWidget {
         children: [
           _ProductImage(imageUrl: product.image),
           const SizedBox(width: 12),
-          Expanded(child: _ProductInfo(product: product)),
+          Expanded(child: _ProductInfo(product: product, isFavorite: isFavoriteVisibleIcon)),
         ],
       ),
     );
   }
 }
 
-// Imagem do produto
 class _ProductImage extends StatelessWidget {
   final String imageUrl;
 
@@ -54,11 +52,11 @@ class _ProductImage extends StatelessWidget {
   }
 }
 
-// Informações do produto
 class _ProductInfo extends StatelessWidget {
   final Product product;
+  final bool isFavorite;
 
-  const _ProductInfo({required this.product});
+  const _ProductInfo({required this.product, required this.isFavorite});
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +65,12 @@ class _ProductInfo extends StatelessWidget {
       children: [
         _ProductDescription(textDescription: product.title),
         const SizedBox(height: 4),
-        _ProductDetailsRow( rate: product.rating.rate, count: product.rating.count),
+        _ProductDetailsRowFavorite( 
+          productId: product.id, 
+          rate: product.rating.rate, 
+          count: product.rating.count, 
+          isFavoriteVisible: isFavorite
+        ),
         const SizedBox(height: 6),
         _ProductPrice(price: product.price),
       ],
@@ -94,19 +97,26 @@ class _ProductDescription extends StatelessWidget {
   }
 }
 
-class _ProductDetailsRow extends StatelessWidget {
+class _ProductDetailsRowFavorite extends StatelessWidget {
+  final int productId;
   final double rate;
-  final int count;  
-  const _ProductDetailsRow({required this.rate, required this.count});
+  final int count;
+  final bool isFavoriteVisible;
+
+  const _ProductDetailsRowFavorite({
+    required this.productId,
+    required this.rate,
+    required this.count,
+    this.isFavoriteVisible = true,
+  });
 
   @override
   Widget build(BuildContext context) {
     return InfoRow(
       text: '$rate ($count reviews)',
-      child: FavoriteIcon(
-           isFavorite: false,
-           onPressed: () => print('Coração clicado'), //TODO: implementar ação
-         )
+      child: isFavoriteVisible
+          ? FavoriteButton(productId: productId)
+          : const SizedBox.shrink(),
     );
   }
 }
@@ -128,3 +138,4 @@ class _ProductPrice extends StatelessWidget {
     );
   }
 }
+

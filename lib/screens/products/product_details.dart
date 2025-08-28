@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:projeto_lista_produtos/controllers/api_controller.dart';
 import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
+import 'package:projeto_lista_produtos/screens/components/favorite_button.dart';
 import 'package:projeto_lista_produtos/screens/components/info_row.dart';
 import 'package:projeto_lista_produtos/screens/components/product_image_skeleton.dart';
 
@@ -10,61 +11,22 @@ class ProductDetails extends StatelessWidget {
   final int? productId;
   final ApiController _apiController = ApiController();
 
-  ProductDetails({super.key,required this.productId});
+  ProductDetails({super.key, required this.productId});
 
   @override
   Widget build(BuildContext context) {
+    if (productId == null) return _buildScaffoldWithError();
 
-   
-    if (productId == null) {
-      return Scaffold(
-        appBar: CustomAppBar(
-          showBackButton: true,
-          roteGoBack: "/",
-          title: 'Product Details',
-        ),
-        body: Center(child: _buildErrorMessage()),
-      );
-    }
-    
-    // Buscar produto pela API
     return FutureBuilder<Product>(
       future: _apiController.fetchProductById(productId!),
       builder: (context, snapshot) {
+
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Enquanto carrega
-          return Scaffold(
-            appBar: CustomAppBar(
-              showBackButton: true,
-              roteGoBack: "/",
-              title: 'Product Details',
-            ),
-            backgroundColor: Colors.white,
-            body: const Center(child: CircularProgressIndicator()),
-          );
-        } else if (snapshot.hasError) {
-          // Se der erro
-          return Scaffold(
-            appBar: CustomAppBar(
-              showBackButton: true,
-              roteGoBack: "/",
-              title: 'Product Details',
-            ),
-            body: Center(child: _buildErrorMessage()),
-          );
-        } else if (!snapshot.hasData) {
-          // Se não retornar produto
-          return Scaffold(
-            appBar: CustomAppBar(
-              showBackButton: true,
-              roteGoBack: "/",
-              title: 'Product Details',
-            ),
-            body: Center(child: _buildErrorMessage()),
-          );
+          return _buildScaffoldWithLoading();
+        } else if (snapshot.hasError || !snapshot.hasData) {
+          return _buildScaffoldWithError();
         }
 
-      
         final product = snapshot.data!;
 
         return Scaffold(
@@ -72,6 +34,7 @@ class ProductDetails extends StatelessWidget {
             showBackButton: true,
             roteGoBack: "/",
             title: 'Product Details',
+            iconWidget: FavoriteButton(productId: product.id),
           ),
           body: SingleChildScrollView(
             child: Container(
@@ -84,7 +47,7 @@ class ProductDetails extends StatelessWidget {
                     minWidth: kIsWeb ? 800 : MediaQuery.of(context).size.width * 0.8,
                     maxWidth: kIsWeb ? 800 : double.infinity,
                   ),
-                  child: _buildProductDetails(product),
+                  child: ProductDetailsContent(product: product),
                 ),
               ),
             ),
@@ -94,7 +57,33 @@ class ProductDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildProductDetails(Product product) {
+  Widget _buildScaffoldWithLoading() => Scaffold(
+        appBar: CustomAppBar(
+          showBackButton: true,
+          roteGoBack: "/",
+          title: 'Product Details',
+        ),
+        backgroundColor: Colors.white,
+        body: const Center(child: CircularProgressIndicator()),
+      );
+
+  Widget _buildScaffoldWithError() => Scaffold(
+        appBar: CustomAppBar(
+          showBackButton: true,
+          roteGoBack: "/",
+          title: 'Product Details',
+        ),
+        body: Center(child: ErrorMessage()),
+      );
+}
+
+
+class ProductDetailsContent extends StatelessWidget {
+  final Product product;
+  const ProductDetailsContent({super.key, required this.product});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(16),
@@ -102,106 +91,134 @@ class ProductDetails extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
-         
-        children: [
-          ProductImageSkeleton(
-            imageUrl: product.image,
-            maxWidth: 310,
-          ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: kIsWeb ? 16 : 0),
+        child: Column(
+          children: [
+            ProductImageSkeleton(imageUrl: product.image, maxWidth: 310),
+            
+            const SizedBox(height: 16),
+            ProductTitle(product.title),
 
-          const SizedBox(height: 16),
-
-          SizedBox(
-            child: Text(
-              product.title,
-              textAlign: TextAlign.left,
-              style: const TextStyle(
-                fontSize: 20,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w500
-              ),    
+            const SizedBox(height: 16),
+            ProductRatingPrice(
+              rate: product.rating.rate,
+              count: product.rating.count,
+              price: product.price,
             ),
-          ),
 
-          const SizedBox(height: 8),
-         
-          InfoRow(
-            text: '${product.rating.rate} (${product.rating.count} reviews)',
-            child:  Text(
-              '\$ ${product.price.toStringAsFixed(2)}',
-              style: const TextStyle(
-                fontSize: 29,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'Poppins',
-                color: Color(0xFF5EC401)),
-              ),
-          ),
-          
-          const SizedBox(height: 16),
+            const SizedBox(height: 30),
+            IconWithDescription(
+              img: 'assets/query_builder-left.png',
+              description: product.category,
+            ),
 
-          _buildIconAndDescription(img: 'assets/query_builder-left.png', description: product.category),
-
-          const SizedBox(height: 16),
-
-          _buildIconAndDescription(img: 'assets/query_builder-justify.png', description: product.description),
-
-        ],
+            const SizedBox(height: 16),
+            IconWithDescription(
+              img: 'assets/query_builder-justify.png',
+              description: product.description,
+            ),
+          ],
+        ),
       ),
     );
-    }
-
-  Widget _buildErrorMessage() {
-  return Padding(
-    padding: const EdgeInsets.all(16),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Image.asset(
-          'assets/error.png',
-          width: 200,
-          height: 200,
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'Something went wrong!',
-          style: const TextStyle(
-            fontSize: 18,
-            color: Color(0xA637474F),
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ],
-    ),
-  );
-  }
-
- Widget _buildIconAndDescription({img, description}) {
-  
-  return Row(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Image.asset(
-        img,
-        width: 24,
-        height: 24,
-      ),
-      const SizedBox(width: 8),
-      Expanded(
-        child: Text(
-          description,
-          style: const TextStyle(
-            fontSize: 16,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    ],
-  );      
   }
 }
 
+class ProductTitle extends StatelessWidget {
+  final String title;
+  const ProductTitle(this.title, {super.key});
 
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      child: Text(
+        title,
+        textAlign: TextAlign.left,
+        style: const TextStyle(
+          fontSize: 20,
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+}
+
+class ProductRatingPrice extends StatelessWidget {
+  final double rate;
+  final int count;
+  final double price;
+  const ProductRatingPrice({super.key, required this.rate, required this.count, required this.price});
+
+  @override
+  Widget build(BuildContext context) {
+    return InfoRow(
+      text: '$rate ($count reviews)',
+      child: Text(
+        '\$ ${price.toStringAsFixed(2)}',
+        style: const TextStyle(
+          fontSize: 29,
+          fontWeight: FontWeight.w700,
+          fontFamily: 'Poppins',
+          color: Color(0xFF5EC401),
+        ),
+      ),
+    );
+  }
+}
+
+class IconWithDescription extends StatelessWidget {
+  final String img;
+  final String description;
+  const IconWithDescription({super.key, required this.img, required this.description});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Image.asset(img, width: 24, height: 24),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            description,
+            style: const TextStyle(
+              fontSize: 16,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ErrorMessage extends StatelessWidget {
+  const ErrorMessage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset('assets/error.png', width: 200, height: 200),
+          const SizedBox(height: 16),
+          const Text(
+            'Something went wrong!',
+            style: TextStyle(
+              fontSize: 18,
+              color: Color(0xA637474F),
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}

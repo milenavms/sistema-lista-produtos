@@ -34,6 +34,7 @@ class Product {
   final String category;
   final String image;
   final Rating rating;
+  final bool isFavorite; 
 
   Product({
     required this.id,
@@ -43,6 +44,7 @@ class Product {
     required this.category,
     required this.image,
     required this.rating,
+    this.isFavorite = false,  
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -54,6 +56,7 @@ class Product {
       category: json['category'] as String,
       image: json['image'] as String,
       rating: Rating.fromJson(json['rating']),
+      isFavorite: json['isFavorite'] ?? false,
     );
   }
 
@@ -66,6 +69,7 @@ class Product {
       'category': category,
       'image': image,
       'rating': rating.toJson(),
+      'isFavorite': isFavorite,
     };
   }
 
@@ -77,6 +81,7 @@ class Product {
     String? category,
     String? image,
     Rating? rating,
+    bool? isFavorite,
   }) {
     return Product(
       id: id ?? this.id,
@@ -86,6 +91,7 @@ class Product {
       category: category ?? this.category,
       image: image ?? this.image,
       rating: rating ?? this.rating,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 }

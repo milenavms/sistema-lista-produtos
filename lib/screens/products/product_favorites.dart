@@ -1,43 +1,58 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:projeto_lista_produtos/controllers/api_controller.dart';
+import 'package:projeto_lista_produtos/controllers/favorites_helper.dart';
 import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
-import 'package:flutter/foundation.dart';
-import 'package:projeto_lista_produtos/screens/products/product_details.dart';
 
 class ProductFavorites extends StatefulWidget {
-  ProductFavorites({super.key});
-
-  final List<Product> products = [
-    Product(
-      id: 1,
-      title: 'Produto 1',
-      description: 'Produto 1',
-      category: 'Categoria 1',
-      price: 10.99,
-      image: 'https://via.placeholder.com/150',
-      rating: Rating(rate: 4.5, count: 100),
-    ),
-  ];
+  const ProductFavorites({super.key});
 
   @override
-  _ProductFavoritesState createState() => _ProductFavoritesState();
+  ProductFavoritesState createState() => ProductFavoritesState();
 }
 
-class _ProductFavoritesState extends State<ProductFavorites> {
+class ProductFavoritesState extends State<ProductFavorites> {
+  final double marginTop = kIsWeb ? 16.0 : 0.0;
+  final double marginBottom = kIsWeb ? 20.0 : 0.0;
+  final double navbarHeight = kToolbarHeight;
 
-   final double marginTop = kIsWeb ? 16.0 : 0.0;
-   final double marginBottom = kIsWeb ? 20.0 : 0.0;
-   final double navbarHeight = kToolbarHeight; // default AppBar height
-   bool get hasProducts => widget.products.isNotEmpty;
+  bool _loading = true;
+  List<Product> _favoriteProducts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFavoriteProducts();
+  }
+
+  Future<void> _loadFavoriteProducts() async {
+    setState(() => _loading = true);
+
+    try {
+      final allProducts = await ApiController().fetchProducts();
+      final favoriteIds = await FavoritesHelper.getFavorites();
+
+      setState(() {
+        _favoriteProducts = allProducts.where((p) => favoriteIds.contains(p.id)).toList();
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() => _loading = false);
+      debugPrint("Erro ao carregar favoritos: $e");
+    }
+  }
+
+  bool get hasProducts => _favoriteProducts.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
         showBackButton: true,
         roteGoBack: "/",
-        title: 'Favorites'
+        title: 'Favorites',
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -51,52 +66,41 @@ class _ProductFavoritesState extends State<ProductFavorites> {
                 color: Colors.white, 
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Column(
-                children: [
-                ConstrainedBox( 
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height - navbarHeight - marginTop - marginBottom - 20,
-                    maxWidth: kIsWeb ? 800 : double.infinity,
-                  ),
-                  child: hasProducts
-                    ? Align( 
-                        alignment: Alignment.topCenter,
-                        child: _buildProductList(widget.products),
-                      )
-                    : Center(
-                        child: _buildErrorMessage(),
-                      ),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - navbarHeight - marginTop - marginBottom - 20,
+                  maxWidth: kIsWeb ? 800 : double.infinity,
                 ),
-                ], 
-              )
+                child: _loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : hasProducts
+                        ? Align(
+                            alignment: Alignment.topCenter,
+                            child: _buildProductList(_favoriteProducts),
+                          )
+                        : Center(child: _buildErrorMessage()),
+              ),
             ),
           ),
         ),
       ),
-    ); 
+    );
   }
 
   Widget _buildProductList(List<Product> products) {
-    return Container(
-      margin: EdgeInsets.only(top: marginTop, bottom: marginBottom),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: products.map((product) {
-          return InkWell(
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/details',
-                arguments: {'id': product.id},
-              );
-            },
-            child: CustomCardProducts(product: product),
-          );
-        }).toList(),
-      ),
+    return Column(
+      children: products.map((product) {
+        return InkWell(
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/details',
+              arguments: {'id': product.id},
+            ).then((_) => _loadFavoriteProducts()); // recarrega ao voltar
+          },
+          child: CustomCardProducts(product: product, isFavoriteVisibleIcon: false),
+        );
+      }).toList(),
     );
   }
 
@@ -112,9 +116,9 @@ class _ProductFavoritesState extends State<ProductFavorites> {
             height: 200,
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'The list is empty',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               color: Color(0xA637474F),
               fontWeight: FontWeight.w600,
@@ -127,5 +131,3 @@ class _ProductFavoritesState extends State<ProductFavorites> {
     );
   }
 }
-
-

@@ -1,1 +1,1 @@
-// URL base, endpoints e constantes da API
+const String baseUrl = "https://fakestoreapi.com";

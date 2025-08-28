@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:projeto_lista_produtos/domain/models/product_model.dart';
+import 'package:projeto_lista_produtos/utils/api.dart';
 
 class ApiController {
-  final Dio _dioUrlAPI = Dio(BaseOptions(baseUrl: "https://fakestoreapi.com"));
+  final Dio _dioUrlAPI = Dio(BaseOptions(baseUrl: baseUrl));
 
   Future<List<Product>> fetchProducts() async {
     try {

@@ -7,18 +7,15 @@ import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
 import 'package:projeto_lista_produtos/screens/components/favorite_icon.dart';
 import 'package:projeto_lista_produtos/screens/components/search_button.dart';
-import 'package:projeto_lista_produtos/screens/products/product_details.dart';
-import 'package:projeto_lista_produtos/screens/products/product_favorites.dart';
 
 class ProductList extends StatefulWidget {
   const ProductList({super.key});
 
   @override
-  _ProductListState createState() => _ProductListState();
+  ProductListState createState() => ProductListState();
 }
 
-class _ProductListState extends State<ProductList>
-    with AutomaticKeepAliveClientMixin<ProductList> {
+class ProductListState extends State<ProductList> with AutomaticKeepAliveClientMixin<ProductList> {
   final ApiController _apiController = ApiController();
 
   List<Product> _allProducts = [];
@@ -209,3 +206,5 @@ class _ProductListState extends State<ProductList>
   @override
   bool get wantKeepAlive => true;
 }
+
+
