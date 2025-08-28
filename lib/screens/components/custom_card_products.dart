@@ -36,7 +36,6 @@ class CustomCardProducts extends StatelessWidget {
   }
 }
 
-
 // Imagem do produto
 class _ProductImage extends StatelessWidget {
   final String imageUrl;
@@ -55,8 +54,6 @@ class _ProductImage extends StatelessWidget {
   }
 }
 
-
-
 // Informações do produto
 class _ProductInfo extends StatelessWidget {
   final Product product;
@@ -68,9 +65,9 @@ class _ProductInfo extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _ProductDescription(textDescription: product.description),
+        _ProductDescription(textDescription: product.title),
         const SizedBox(height: 4),
-        _ProductDetailsRow(),
+        _ProductDetailsRow( rate: product.rating.rate, count: product.rating.count),
         const SizedBox(height: 6),
         _ProductPrice(price: product.price),
       ],
@@ -98,12 +95,14 @@ class _ProductDescription extends StatelessWidget {
 }
 
 class _ProductDetailsRow extends StatelessWidget {
-  const _ProductDetailsRow();
+  final double rate;
+  final int count;  
+  const _ProductDetailsRow({required this.rate, required this.count});
 
   @override
   Widget build(BuildContext context) {
     return InfoRow(
-      text: "Entrega prevista para amanhã",
+      text: '$rate ($count reviews)',
       child: FavoriteIcon(
            isFavorite: false,
            onPressed: () => print('Coração clicado'), //TODO: implementar ação

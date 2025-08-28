@@ -7,11 +7,19 @@ class ApiController {
   Future<List<Product>> fetchProducts() async {
     try {
       final response = await _dioUrlAPI.get('/products');
-
       final List<dynamic> data = response.data;
       return data.map((json) => Product.fromJson(json)).toList();
     } on DioException catch (e) {
       throw Exception("Erro na requisição: ${e.message}");
+    }
+  }
+
+  Future<Product> fetchProductById(int id) async {
+    try {
+      final response = await _dioUrlAPI.get('/products/$id');
+      return Product.fromJson(response.data);
+    } on DioException catch (e) {
+      throw Exception("Erro ao buscar produto: ${e.message}");
     }
   }
 }
