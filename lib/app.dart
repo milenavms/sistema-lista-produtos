@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'screens/products/product_favorites.dart';
-import 'screens/products/product_list.dart';
-import 'screens/products/product_details.dart';
+import 'screens/products/product_favorites_page.dart';
+import 'screens/products/product_list_page.dart';
+import 'screens/products/product_details_page.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
