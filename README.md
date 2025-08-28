@@ -94,7 +94,7 @@ flutter run -d chrome
 WEB - Chrome
 
 
-![Image](https://github.com/user-attachments/assets/a7a85034-b4ac-4335-85d1-53cbf7236982)
+![Image](https://github.com/user-attachments/assets/98260886-8406-42d1-ac56-bcaaa4938222)
 
 Mobile Iphone SE
 
