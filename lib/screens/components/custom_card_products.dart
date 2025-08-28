@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:projeto_lista_produtos/domain/models/product.dart';
+import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/info_row.dart';
 import 'favorite_icon.dart';
 
@@ -28,7 +28,7 @@ class CustomCardProducts extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ProductImage(imageUrl: product.imageUrl, width: imageWidth, height: imageHeight),
+          _ProductImage(imageUrl: product.image, width: imageWidth, height: imageHeight),
           const SizedBox(width: 12),
           Expanded(child: _ProductInfo(product: product)),
         ],

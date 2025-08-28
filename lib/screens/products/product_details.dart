@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:projeto_lista_produtos/domain/models/product.dart';
+import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/favorite_icon.dart';
 import 'package:projeto_lista_produtos/screens/components/info_row.dart';
@@ -13,33 +13,11 @@ class ProductDetails extends StatelessWidget {
   final List<Product> productList = [
     Product(
       id: 1,
-      description: 'Produto 1 duehufiegb  dejhdui 2ehdbe euggdu iedebjw',
+      title: 'Produto 1',
+      description: 'Produto 1',
+      category: 'Categoria 1',
       price: 10.99,
-      imageUrl: 'https://via.placeholder.com/150',
-    ),
-    Product(
-      id: 2,
-      description: 'Produto 2',
-      price: 25.50,
-      imageUrl: 'https://via.placeholder.com/150',
-    ),
-    Product(
-      id: 3,
-      description: 'Produto 3',
-      price: 12.75,
-      imageUrl: 'https://via.placeholder.com/150',
-    ),
-    Product(
-      id: 4,
-      description: 'Produto 4',
-      price: 25.50,
-      imageUrl: 'https://via.placeholder.com/150',
-    ),
-    Product(
-      id: 5,
-      description: 'Produto 5',
-      price: 12.75,
-      imageUrl: 'https://via.placeholder.com/150',
+      image: 'https://via.placeholder.com/150',
     ),
   ];
 
@@ -106,7 +84,7 @@ class ProductDetails extends StatelessWidget {
             width: 310,
             height: 320,
             child: Image.network(
-              product.imageUrl,
+              product.image,
               fit: BoxFit.cover,
             ),
           ),

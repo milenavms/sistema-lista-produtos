@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:projeto_lista_produtos/domain/models/product.dart';
+import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
 import 'package:flutter/foundation.dart';
@@ -11,9 +11,11 @@ class ProductFavorites extends StatefulWidget {
   final List<Product> products = [
     Product(
       id: 1,
+      title: 'Produto 1',
       description: 'Produto 1',
+      category: 'Categoria 1',
       price: 10.99,
-      imageUrl: 'https://via.placeholder.com/150',
+      image: 'https://via.placeholder.com/150',
     ),
   ];
 
