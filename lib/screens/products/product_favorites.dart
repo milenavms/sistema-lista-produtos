@@ -16,6 +16,7 @@ class ProductFavorites extends StatefulWidget {
       category: 'Categoria 1',
       price: 10.99,
       image: 'https://via.placeholder.com/150',
+      rating: Rating(rate: 4.5, count: 100),
     ),
   ];
 
