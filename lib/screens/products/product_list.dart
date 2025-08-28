@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projeto_lista_produtos/controllers/api_controller.dart';
@@ -16,18 +17,61 @@ class ProductList extends StatefulWidget {
 }
 
 class _ProductListState extends State<ProductList> {
+  final ApiController _apiController = ApiController();
 
-   final ApiController _apiController = ApiController();
-   late Future<List<Product>> _productsFuture;
+  List<Product> _allProducts = [];
+  List<Product> _filteredProducts = [];
+  bool _loading = true;
 
-   final double marginTop = kIsWeb ? 16.0 : 0.0;
-   final double marginBottom = kIsWeb ? 20.0 : 0.0;
-   final double navbarHeight = kToolbarHeight; // default AppBar height
+  final double marginTop = kIsWeb ? 16.0 : 0.0;
+  final double marginBottom = kIsWeb ? 20.0 : 0.0;
+  final double navbarHeight = kToolbarHeight; // default AppBar height
+
+   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _productsFuture = _apiController.fetchProducts();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      final products = await _apiController.fetchProducts();
+
+      setState(() {
+        _allProducts = products.map((p) => p.copyWith(
+        title: p.title.toLowerCase(),
+      )).toList();
+        _filteredProducts = products;
+        _loading = false;
+      });
+
+    } catch (e) {
+      setState(() {
+        _loading = false;
+      });
+      debugPrint("Erro ao carregar produtos: $e");
+    }
+  }
+
+  void _filterProducts(String query) {
+    final filtered = _allProducts.where((p) {
+      return p.title.contains(query.toLowerCase());
+    }).toList();
+
+    setState(() {
+      _filteredProducts = filtered;
+    });
+  }
+
+ 
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _filterProducts(query);
+    });
   }
 
   @override
@@ -38,7 +82,7 @@ class _ProductListState extends State<ProductList> {
         iconWidget: FavoriteIcon(
           isFavorite: false,
           onPressed: () {
-            context.go('/favorites'); 
+            context.go('/favorites');
           },
         ),
       ),
@@ -51,47 +95,37 @@ class _ProductListState extends State<ProductList> {
               margin: EdgeInsets.only(top: marginTop, bottom: marginBottom),
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
-                color: Colors.white, 
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Column(
                 children: [
-                SearchButton(),
-                ConstrainedBox( 
-                  constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height - navbarHeight - marginTop - marginBottom - 100,
-                    maxWidth: kIsWeb ? 800 : double.infinity,
-                  ),
-                  child: FutureBuilder<List<Product>>(
-                      future: _productsFuture,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(
-                            child: Text("Erro: ${snapshot.error}"),
-                          );
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return Center(child: _buildErrorMessage());
-                        }
-
-                        return Align(
-                          alignment: Alignment.topCenter,
-                          child: _buildProductList(snapshot.data!),
-                        );
-                      },
+                  SearchButton(onChanged: _onSearchChanged),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height -
+                          navbarHeight -
+                          marginTop -
+                          marginBottom -
+                          100,
+                      maxWidth: kIsWeb ? 800 : double.infinity,
                     ),
+                    child: _loading
+                        ? const Center(child: CircularProgressIndicator())
+                        : _filteredProducts.isEmpty
+                            ? _buildErrorMessage()
+                            : Align(
+                                alignment: Alignment.topCenter,
+                                child: _buildProductList(_filteredProducts),
+                              ),
                   ),
-                ], 
-              )
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ); 
+    );
   }
 
   Widget _buildProductList(List<Product> products) {
@@ -141,5 +175,3 @@ class _ProductListState extends State<ProductList> {
     );
   }
 }
-
-

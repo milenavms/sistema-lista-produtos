@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class SearchButton extends StatefulWidget {
-  const SearchButton({super.key});
+  final void Function(String)? onChanged;
+
+  const SearchButton({super.key, this.onChanged});
 
   @override
   State<SearchButton> createState() => _SearchBarAppState();
@@ -16,9 +18,7 @@ class _SearchBarAppState extends State<SearchButton> {
        child: SearchBar(
                 leading: const Icon(Icons.search),
                 hintText: 'Search Anything',
-                onChanged: (value) {
-                  print('Texto alterado: $value ');
-                },
+                onChanged: widget.onChanged,
                 padding: const WidgetStatePropertyAll<EdgeInsets>(
                   EdgeInsets.symmetric(horizontal: 8.0),
                 ),
