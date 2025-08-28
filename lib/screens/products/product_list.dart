@@ -1,49 +1,60 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:projeto_lista_produtos/controllers/api_controller.dart';
 import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
 import 'package:projeto_lista_produtos/screens/components/favorite_icon.dart';
-import 'package:flutter/foundation.dart';
 import 'package:projeto_lista_produtos/screens/components/search_button.dart';
+import 'package:projeto_lista_produtos/screens/products/product_details.dart';
+import 'package:projeto_lista_produtos/screens/products/product_favorites.dart';
 
 class ProductList extends StatefulWidget {
-  ProductList({super.key});
+  const ProductList({super.key});
 
   @override
   _ProductListState createState() => _ProductListState();
 }
 
-class _ProductListState extends State<ProductList> {
+class _ProductListState extends State<ProductList>
+    with AutomaticKeepAliveClientMixin<ProductList> {
   final ApiController _apiController = ApiController();
 
   List<Product> _allProducts = [];
-  List<Product> _filteredProducts = [];
+  final ValueNotifier<List<Product>> filteredProductsNotifier = ValueNotifier([]);
+  final ValueNotifier<String> searchQuery = ValueNotifier('');
+
   bool _loading = true;
 
   final double marginTop = kIsWeb ? 16.0 : 0.0;
   final double marginBottom = kIsWeb ? 20.0 : 0.0;
-  final double navbarHeight = kToolbarHeight; // default AppBar height
+  final double navbarHeight = kToolbarHeight;
 
-   Timer? _debounce;
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _loadProducts();
+
+    // Sempre que searchQuery mudar, filtra a lista
+    searchQuery.addListener(() {
+      _onSearchChanged(searchQuery.value);
+    });
   }
 
   Future<void> _loadProducts() async {
     try {
       final products = await _apiController.fetchProducts();
 
-      setState(() {
-        _allProducts = products.map((p) => p.copyWith(
+      _allProducts = products.map((p) => p.copyWith(
         title: p.title.toLowerCase(),
       )).toList();
-        _filteredProducts = products;
+
+      filteredProductsNotifier.value = _allProducts;
+
+      setState(() {
         _loading = false;
       });
 
@@ -60,12 +71,9 @@ class _ProductListState extends State<ProductList> {
       return p.title.contains(query.toLowerCase());
     }).toList();
 
-    setState(() {
-      _filteredProducts = filtered;
-    });
+    filteredProductsNotifier.value = filtered;
   }
 
- 
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
@@ -75,14 +83,26 @@ class _ProductListState extends State<ProductList> {
   }
 
   @override
+  void dispose() {
+    _debounce?.cancel();
+    filteredProductsNotifier.dispose();
+    searchQuery.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: CustomAppBar(
         title: 'Products',
         iconWidget: FavoriteIcon(
           isFavorite: false,
           onPressed: () {
-            context.go('/favorites');
+            Navigator.pushNamed(
+              context,
+              '/favorites',
+            );
           },
         ),
       ),
@@ -100,7 +120,7 @@ class _ProductListState extends State<ProductList> {
               ),
               child: Column(
                 children: [
-                  SearchButton(onChanged: _onSearchChanged),
+                  SearchButton(searchQuery: searchQuery),
                   ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight: MediaQuery.of(context).size.height -
@@ -110,14 +130,21 @@ class _ProductListState extends State<ProductList> {
                           100,
                       maxWidth: kIsWeb ? 800 : double.infinity,
                     ),
-                    child: _loading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _filteredProducts.isEmpty
-                            ? _buildErrorMessage()
-                            : Align(
-                                alignment: Alignment.topCenter,
-                                child: _buildProductList(_filteredProducts),
-                              ),
+                    child: ValueListenableBuilder<List<Product>>(
+                      valueListenable: filteredProductsNotifier,
+                      builder: (context, products, _) {
+                        if (_loading) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        if (products.isEmpty) {
+                          return _buildErrorMessage();
+                        }
+                        return Align(
+                          alignment: Alignment.topCenter,
+                          child: _buildProductList(products),
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -139,7 +166,11 @@ class _ProductListState extends State<ProductList> {
         children: products.map((product) {
           return InkWell(
             onTap: () {
-              context.go('/details/${product.id}');
+              Navigator.pushNamed(
+                context,
+                '/details',
+                arguments: {'id': product.id},
+              );
             },
             child: CustomCardProducts(product: product),
           );
@@ -174,4 +205,7 @@ class _ProductListState extends State<ProductList> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

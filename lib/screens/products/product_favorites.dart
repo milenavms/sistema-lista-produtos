@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
 import 'package:flutter/foundation.dart';
+import 'package:projeto_lista_produtos/screens/products/product_details.dart';
 
 class ProductFavorites extends StatefulWidget {
   ProductFavorites({super.key});
@@ -87,7 +87,11 @@ class _ProductFavoritesState extends State<ProductFavorites> {
         children: products.map((product) {
           return InkWell(
             onTap: () {
-              context.go('/details/${product.id}');
+              Navigator.pushNamed(
+                context,
+                '/details',
+                arguments: {'id': product.id},
+              );
             },
             child: CustomCardProducts(product: product),
           );

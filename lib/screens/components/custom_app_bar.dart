@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:go_router/go_router.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -34,11 +33,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.black),
                 onPressed: () {
-                  if (roteGoBack != null) {
-                    context.go(roteGoBack!); // usa go_router
-                  } else {
-                    Navigator.of(context).pop(); // fallback
-                  }
+                    Navigator.of(context).pop();
                 },
               ),
 
