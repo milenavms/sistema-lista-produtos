@@ -6,6 +6,16 @@ Aplicação desenvolvida em Flutter para listar e favoritar produtos.
 ### ⚙️ Tecnologias Utilizadas
 - **Flutter** –  Web, Android e IOS
 
+### ⚙️ Api Utilizada
+- **fakestoreapi** –  https://fakestoreapi.com/docs
+
+### ⚙️ Gerenciamento de Estado
+- **ValueNotifier** –  Gerencia o estado estre as telas de Listar produtos, Detalhes do Produto e Favoritos.
+
+### ⚙️ Armazenamento Local
+- **shared_preferences** –  Armazena os id dos produtos favoritos.
+
+
 ## ⚠️ Dependências
 
 - Instale as dependências do Flutter:
