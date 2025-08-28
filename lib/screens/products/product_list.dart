@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:projeto_lista_produtos/controllers/api_controller.dart';
 import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
@@ -10,28 +11,24 @@ import 'package:projeto_lista_produtos/screens/components/search_button.dart';
 class ProductList extends StatefulWidget {
   ProductList({super.key});
 
-  final List<Product> products = [
-    Product(
-      id: 1,
-      title: 'Produto 1',
-      description: 'Produto 1',
-      category: 'Categoria 1',
-      price: 10.99,
-      image: 'https://via.placeholder.com/150', 
-      
-    ),
-  ];
-
   @override
   _ProductListState createState() => _ProductListState();
 }
 
 class _ProductListState extends State<ProductList> {
 
+   final ApiController _apiController = ApiController();
+   late Future<List<Product>> _productsFuture;
+
    final double marginTop = kIsWeb ? 16.0 : 0.0;
    final double marginBottom = kIsWeb ? 20.0 : 0.0;
    final double navbarHeight = kToolbarHeight; // default AppBar height
-   bool get hasProducts => widget.products.isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+    _productsFuture = _apiController.fetchProducts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,15 +62,29 @@ class _ProductListState extends State<ProductList> {
                     minHeight: MediaQuery.of(context).size.height - navbarHeight - marginTop - marginBottom - 100,
                     maxWidth: kIsWeb ? 800 : double.infinity,
                   ),
-                  child: hasProducts
-                    ? Align( 
-                        alignment: Alignment.topCenter,
-                        child: _buildProductList(widget.products),
-                      )
-                    : Center(
-                        child: _buildErrorMessage(),
-                      ),
-                ),
+                  child: FutureBuilder<List<Product>>(
+                      future: _productsFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text("Erro: ${snapshot.error}"),
+                          );
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return Center(child: _buildErrorMessage());
+                        }
+
+                        return Align(
+                          alignment: Alignment.topCenter,
+                          child: _buildProductList(snapshot.data!),
+                        );
+                      },
+                    ),
+                  ),
                 ], 
               )
             ),

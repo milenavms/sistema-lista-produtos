@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/info_row.dart';
+import 'package:projeto_lista_produtos/screens/components/product_image_skeleton.dart';
 import 'favorite_icon.dart';
 
 
@@ -12,8 +12,7 @@ class CustomCardProducts extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double imageWidth = kIsWeb ? 130 : 100;
-    final double imageHeight = kIsWeb ? 121 : 90;
+
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -28,7 +27,7 @@ class CustomCardProducts extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ProductImage(imageUrl: product.image, width: imageWidth, height: imageHeight),
+          _ProductImage(imageUrl: product.image),
           const SizedBox(width: 12),
           Expanded(child: _ProductInfo(product: product)),
         ],
@@ -37,27 +36,26 @@ class CustomCardProducts extends StatelessWidget {
   }
 }
 
+
 // Imagem do produto
 class _ProductImage extends StatelessWidget {
   final String imageUrl;
-  final double width;
-  final double height;
 
   const _ProductImage({
     required this.imageUrl,
-    required this.width,
-    required this.height,
-  });
+     Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Image.network(imageUrl, fit: BoxFit.cover),
+    return ProductImageSkeleton(
+      imageUrl: imageUrl,
+      maxWidth: 90,
     );
   }
 }
+
+
 
 // Informações do produto
 class _ProductInfo extends StatelessWidget {
@@ -88,6 +86,8 @@ class _ProductDescription extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       textDescription,
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
       style: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w500,
