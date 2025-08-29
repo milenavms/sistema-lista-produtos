@@ -89,6 +89,29 @@ flutter run -d <navegador>
 flutter run -d chrome
 ```
 
+#### Testes
+
+O projeto utiliza o **Flutter Test** para testes unitários e de widget.
+
+Para rodar todos os testes do projeto, execute:
+
+```bash
+flutter test
+```
+ou 
+
+```bash
+flutter test -r expanded
+```
+
+ou 
+
+```bash
+flutter test test/utils/nome_do_arquivo_de_teste.dart
+```
+
+
+
 ## 📸 Imagens da Tela
 
 WEB - Chrome
