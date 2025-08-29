@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/favorite_button.dart';
 import 'package:projeto_lista_produtos/screens/components/info_row.dart';
-import 'package:projeto_lista_produtos/screens/components/product_image_skeleton.dart';
 
 class CustomCardProducts extends StatelessWidget {
   final Product product;
@@ -26,7 +25,7 @@ class CustomCardProducts extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ProductImage(imageUrl: product.image),
+          ProductImage(imageUrl: product.image),
           const SizedBox(width: 12),
           Expanded(child: _ProductInfo(product: product, isFavorite: isFavoriteVisibleIcon)),
         ],
@@ -35,19 +34,32 @@ class CustomCardProducts extends StatelessWidget {
   }
 }
 
-class _ProductImage extends StatelessWidget {
+class ProductImage extends StatelessWidget {
   final String imageUrl;
 
-  const _ProductImage({
+   const ProductImage({
     required this.imageUrl,
-     Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ProductImageSkeleton(
-      imageUrl: imageUrl,
-      maxWidth: 90,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 90),
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) {
+            return const Icon(
+              Icons.broken_image,
+              size: 40,
+              color: Colors.grey,
+            );
+          },
+        ),
+      ),
     );
   }
 }

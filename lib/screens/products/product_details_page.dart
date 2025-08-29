@@ -5,20 +5,28 @@ import 'package:projeto_lista_produtos/domain/models/product_model.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/favorite_button.dart';
 import 'package:projeto_lista_produtos/screens/components/info_row.dart';
-import 'package:projeto_lista_produtos/screens/components/product_image_skeleton.dart';
 
 class ProductDetails extends StatelessWidget {
   final int? productId;
-  final ApiController _apiController = ApiController();
+  final ApiController? apiController;
+  final ImageProvider Function(String path)? assetImageBuilder;
 
-  ProductDetails({super.key, required this.productId});
+  const ProductDetails({
+    super.key, 
+    required this.productId, 
+    this.apiController, 
+    this.assetImageBuilder,
+  });
+
 
   @override
   Widget build(BuildContext context) {
     if (productId == null) return _buildScaffoldWithError();
 
+    final controller = apiController ?? ApiController(); 
+
     return FutureBuilder<Product>(
-      future: _apiController.fetchProductById(productId!),
+      future:  controller.fetchProductById(productId!),
       builder: (context, snapshot) {
 
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -47,7 +55,7 @@ class ProductDetails extends StatelessWidget {
                     minWidth: kIsWeb ? 800 : MediaQuery.of(context).size.width * 0.8,
                     maxWidth: kIsWeb ? 800 : double.infinity,
                   ),
-                  child: ProductDetailsContent(product: product),
+                  child: ProductDetailsContent(product: product, assetImageBuilder: assetImageBuilder,),
                 ),
               ),
             ),
@@ -73,14 +81,18 @@ class ProductDetails extends StatelessWidget {
           roteGoBack: "/",
           title: 'Product Details',
         ),
-        body: Center(child: ErrorMessage()),
+        body: Center(child: ErrorMessage( 
+          assetImageBuilder: (path) => const AssetImage(''), 
+          )),
       );
 }
 
 
 class ProductDetailsContent extends StatelessWidget {
   final Product product;
-  const ProductDetailsContent({super.key, required this.product});
+  final ImageProvider Function(String path)? assetImageBuilder;
+
+  const ProductDetailsContent({super.key, required this.product, this.assetImageBuilder});
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +107,24 @@ class ProductDetailsContent extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: kIsWeb ? 16 : 0),
         child: Column(
           children: [
-            ProductImageSkeleton(imageUrl: product.image, maxWidth: 310),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 310),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: Image.network(
+                  product.image,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Exibe ícone de erro se a imagem não carregar
+                    return const Icon(
+                      Icons.broken_image,
+                      size: 40,
+                      color: Colors.grey,
+                    );
+                  },
+                ),
+              ),
+            ),
             
             const SizedBox(height: 16),
             ProductTitle(product.title),
@@ -109,13 +138,15 @@ class ProductDetailsContent extends StatelessWidget {
 
             const SizedBox(height: 30),
             IconWithDescription(
-              img: 'assets/query_builder-left.png',
+              img: assetImageBuilder?.call('assets/query_builder-left.png') 
+                  ?? const AssetImage('assets/query_builder-left.png'),
               description: product.category,
             ),
 
             const SizedBox(height: 16),
             IconWithDescription(
-              img: 'assets/query_builder-justify.png',
+               img: assetImageBuilder?.call('assets/query_builder-justify.png') 
+                  ?? const AssetImage('assets/query_builder-justify.png'),
               description: product.description,
             ),
           ],
@@ -169,7 +200,7 @@ class ProductRatingPrice extends StatelessWidget {
 }
 
 class IconWithDescription extends StatelessWidget {
-  final String img;
+  final ImageProvider img;
   final String description;
   const IconWithDescription({super.key, required this.img, required this.description});
 
@@ -178,7 +209,7 @@ class IconWithDescription extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Image.asset(img, width: 24, height: 24),
+        Image(image: img, width: 24, height: 24),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
@@ -196,7 +227,9 @@ class IconWithDescription extends StatelessWidget {
 }
 
 class ErrorMessage extends StatelessWidget {
-  const ErrorMessage({super.key});
+  final ImageProvider Function(String path)? assetImageBuilder;
+
+  const ErrorMessage({super.key, this.assetImageBuilder});
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +238,10 @@ class ErrorMessage extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset('assets/error.png', width: 200, height: 200),
+          Image( 
+            image: assetImageBuilder?.call('assets/error.png') ?? const AssetImage('assets/error.png'),
+            width: 200,
+            height: 200,),
           const SizedBox(height: 16),
           const Text(
             'Something went wrong!',

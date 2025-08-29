@@ -3,13 +3,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FavoritesHelper {
   static const String _keyFavorites = 'favorites';
 
-  static Future<List<int>> getFavorites() async {
+  FavoritesHelper();
+
+  Future<List<int>> getFavorites() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getStringList(_keyFavorites) ?? [];
     return data.map(int.parse).toList();
   }
 
-  static Future<void> toggleFavorite(int productId) async {
+  Future<void> toggleFavorite(int productId) async {
     final prefs = await SharedPreferences.getInstance();
     final favorites = await getFavorites();
 

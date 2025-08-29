@@ -3,19 +3,21 @@ import 'package:flutter/material.dart';
 class InfoRow extends StatelessWidget {
   final String text;
   final Widget child;
+  final ImageProvider<Object> Function(String path)? assetImageBuilder;
 
   const InfoRow({
     super.key,
     required this.text,
     required this.child,
+    this.assetImageBuilder,
   });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Image.asset(
-          'assets/star.png',
+        Image(
+          image: assetImageBuilder?.call('assets/star.png') ?? const AssetImage('assets/star.png'),
           width: 22,
           height: 22,
         ),

@@ -9,14 +9,17 @@ import 'package:projeto_lista_produtos/screens/components/favorite_icon.dart';
 import 'package:projeto_lista_produtos/screens/components/search_button.dart';
 
 class ProductList extends StatefulWidget {
-  const ProductList({super.key});
+  final ApiController? apiController;
+  final ImageProvider Function(String path)? assetImageBuilder;
+
+  const ProductList({super.key, this.apiController, this.assetImageBuilder});
 
   @override
   ProductListState createState() => ProductListState();
 }
 
 class ProductListState extends State<ProductList> with AutomaticKeepAliveClientMixin<ProductList> {
-  final ApiController _apiController = ApiController();
+  late final ApiController _apiController;
 
   List<Product> _allProducts = [];
   final ValueNotifier<List<Product>> filteredProductsNotifier = ValueNotifier([]);
@@ -33,6 +36,8 @@ class ProductListState extends State<ProductList> with AutomaticKeepAliveClientM
   @override
   void initState() {
     super.initState();
+
+    _apiController = widget.apiController ?? ApiController();
     _loadProducts();
 
     // Sempre que searchQuery mudar, filtra a lista
@@ -177,16 +182,14 @@ class ProductListState extends State<ProductList> with AutomaticKeepAliveClientM
   }
 
   Widget _buildErrorMessage() {
+    final builder = widget.assetImageBuilder ?? (path) => AssetImage(path);
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(
-            'assets/error_search.png',
-            width: 200,
-            height: 200,
-          ),
+          Image(image: builder('assets/error_search.png'), width: 200, height: 200),
           const SizedBox(height: 16),
           Text(
             'The list is empty',

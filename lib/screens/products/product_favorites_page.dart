@@ -7,7 +7,12 @@ import 'package:projeto_lista_produtos/screens/components/custom_app_bar.dart';
 import 'package:projeto_lista_produtos/screens/components/custom_card_products.dart';
 
 class ProductFavorites extends StatefulWidget {
-  const ProductFavorites({super.key});
+
+  final ImageProvider Function(String path)? assetImageBuilder;
+
+  final ApiController? apiController;
+
+  const ProductFavorites({super.key, this.assetImageBuilder, this.apiController});
 
   @override
   ProductFavoritesState createState() => ProductFavoritesState();
@@ -17,6 +22,8 @@ class ProductFavoritesState extends State<ProductFavorites> {
   final double marginTop = kIsWeb ? 16.0 : 0.0;
   final double marginBottom = kIsWeb ? 20.0 : 0.0;
   final double navbarHeight = kToolbarHeight;
+
+
 
   bool _loading = true;
   List<Product> _favoriteProducts = [];
@@ -31,8 +38,11 @@ class ProductFavoritesState extends State<ProductFavorites> {
     setState(() => _loading = true);
 
     try {
-      final allProducts = await ApiController().fetchProducts();
-      final favoriteIds = await FavoritesHelper.getFavorites();
+      final controller = widget.apiController ?? ApiController();
+      final helper = FavoritesHelper();
+      
+      final allProducts = await controller.fetchProducts();
+      final favoriteIds = await helper.getFavorites();
 
       setState(() {
         _favoriteProducts = allProducts.where((p) => favoriteIds.contains(p.id)).toList();
@@ -105,13 +115,14 @@ class ProductFavoritesState extends State<ProductFavorites> {
   }
 
   Widget _buildErrorMessage() {
+ 
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset(
-            'assets/error_search.png',
+          Image(
+            image: widget.assetImageBuilder?.call('assets/error_search.png') ?? const AssetImage('assets/error_search.png'),
             width: 200,
             height: 200,
           ),
